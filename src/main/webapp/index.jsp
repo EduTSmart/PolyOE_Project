@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,13 @@
     </style>
 </head>
 <body>
+	<c:if test="${!empty sessionScope.user}">
+	    <div style="background-color: #e0f7fa; padding: 10px; margin-bottom: 20px;">
+	        Xin chào: <strong>${sessionScope.user.fullname}</strong> 
+	        (Lượt truy cập hệ thống: ${applicationScope.visitors})
+	    </div>
+	</c:if>
+
     <h2>PolyOE - Hệ thống Quản lý Video Online</h2>
     
     <div class="menu">
