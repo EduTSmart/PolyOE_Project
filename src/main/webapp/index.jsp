@@ -34,19 +34,35 @@
             font-weight: bold;
         }
         .login-btn:hover { background-color: #1565c0; }
+        
+        /* Style riêng cho nút đăng xuất */
+        .logout-btn {
+            background-color: #d32f2f;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .logout-btn:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
     
-    <!-- THANH THÔNG BÁO VÀ ĐĂNG NHẬP -->
+    <!-- THANH THÔNG BÁO -->
     <div class="header-bar">
         <span>
             <c:choose>
                 <c:when test="${not empty sessionScope.user}">
                     Xin chào: <strong>${sessionScope.user.fullname}</strong>
+                    <!-- Nút đăng xuất hiển thị khi đã đăng nhập -->
+                    <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
                 </c:when>
                 <c:otherwise>
                     <i>Bạn chưa đăng nhập</i> 
+                    <!-- Nút đăng nhập hiển thị khi chưa đăng nhập -->
                     <a href="${pageContext.request.contextPath}/login" class="login-btn" style="margin-left: 10px;">Đăng nhập</a>
                 </c:otherwise>
             </c:choose>
