@@ -33,8 +33,13 @@ public class LoginServlet extends HttpServlet {
             // Đăng nhập thành công, lưu vào session
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            request.setAttribute("message", "Đăng nhập thành công!");
+            
+            // Chuyển hướng (redirect) về lại trang chủ thay vì ở lại trang login
+            response.sendRedirect(request.getContextPath() + "/");
+            return; // Bắt buộc phải có return để dừng hàm, không chạy lệnh forward bên dưới
         }
+        
+        // Nếu rơi vào các trường hợp báo lỗi (user null hoặc sai pass) thì mới forward lại trang login
         request.getRequestDispatcher("/views/login.jsp").forward(request, response);
     }
 }

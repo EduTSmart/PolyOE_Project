@@ -12,22 +12,23 @@ import java.nio.file.Paths;
 
 @WebListener
 public class VisitorListener implements ServletContextListener, HttpSessionListener {
-    // Đường dẫn lưu file đếm (lưu ở thư mục tạm của hệ thống để tránh lỗi quyền truy cập)
-    private static final String FILE_PATH = System.getProperty("java.io.tmpdir") + File.separator + "visitors.txt";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext application = sce.getServletContext();
+        // Lấy đường dẫn thực tế của file visitors.txt trong thư mục webapp
+        String filePath = application.getRealPath("/visitors.txt");
+        application.setAttribute("FILE_PATH", filePath); // Lưu lại để dùng lúc destroy
+        
         long visitors = 0;
         try {
-            if (new File(FILE_PATH).exists()) {
-                String content = Files.readString(Paths.get(FILE_PATH));
+            if (filePath != null && new File(filePath).exists()) {
+                String content = Files.readString(Paths.get(filePath));
                 visitors = Long.parseLong(content.trim());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Chia sẻ qua application scope
         application.setAttribute("visitors", visitors);
     }
 
@@ -37,7 +38,6 @@ public class VisitorListener implements ServletContextListener, HttpSessionListe
         Long visitors = (Long) application.getAttribute("visitors");
         if (visitors == null) visitors = 0L;
         
-        // Tăng số đếm lên 1
         visitors++;
         application.setAttribute("visitors", visitors);
     }
@@ -46,10 +46,11 @@ public class VisitorListener implements ServletContextListener, HttpSessionListe
     public void contextDestroyed(ServletContextEvent sce) {
         ServletContext application = sce.getServletContext();
         Long visitors = (Long) application.getAttribute("visitors");
+        String filePath = (String) application.getAttribute("FILE_PATH");
+        
         try {
-            // Lưu số đếm trở lại file
-            if (visitors != null) {
-                Files.writeString(Paths.get(FILE_PATH), String.valueOf(visitors));
+            if (visitors != null && filePath != null) {
+                Files.writeString(Paths.get(filePath), String.valueOf(visitors));
             }
         } catch (Exception e) {
             e.printStackTrace();

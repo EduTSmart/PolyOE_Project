@@ -11,15 +11,50 @@
         .menu a { display: block; margin-bottom: 10px; font-size: 18px; text-decoration: none; color: blue; margin-left: 15px; }
         .menu a:hover { text-decoration: underline; color: darkblue; }
         h3 { margin-top: 30px; color: #d32f2f; border-bottom: 1px solid #ccc; padding-bottom: 5px; width: 60%; }
+        
+        /* Style cho thanh thông báo đầu trang */
+        .header-bar {
+            background-color: #e0f7fa; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            width: 60%; 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #b2ebf2;
+        }
+        .login-btn {
+            background-color: #1976d2;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .login-btn:hover { background-color: #1565c0; }
     </style>
 </head>
 <body>
-	<c:if test="${!empty sessionScope.user}">
-	    <div style="background-color: #e0f7fa; padding: 10px; margin-bottom: 20px;">
-	        Xin chào: <strong>${sessionScope.user.fullname}</strong> 
-	        (Lượt truy cập hệ thống: ${applicationScope.visitors})
-	    </div>
-	</c:if>
+    
+    <!-- THANH THÔNG BÁO VÀ ĐĂNG NHẬP -->
+    <div class="header-bar">
+        <span>
+            <c:choose>
+                <c:when test="${not empty sessionScope.user}">
+                    Xin chào: <strong>${sessionScope.user.fullname}</strong>
+                </c:when>
+                <c:otherwise>
+                    <i>Bạn chưa đăng nhập</i> 
+                    <a href="${pageContext.request.contextPath}/login" class="login-btn" style="margin-left: 10px;">Đăng nhập</a>
+                </c:otherwise>
+            </c:choose>
+        </span>
+        <span>
+            Lượt truy cập hệ thống: <strong>${applicationScope.visitors != null ? applicationScope.visitors : 0}</strong>
+        </span>
+    </div>
 
     <h2>PolyOE - Hệ thống Quản lý Video Online</h2>
     
@@ -29,7 +64,7 @@
         <a href="${pageContext.request.contextPath}/user-favorites">&#128279; Bài 3: Xem Video Yêu Thích Của Nguyễn Văn Tèo</a>
         <a href="${pageContext.request.contextPath}/all-favorites">&#128279; Bài 4: Danh Sách Tất Cả Video Được Yêu Thích</a>
         
-        <!-- CÁC CHỨC NĂNG CỦA LAB 4 MỚI THÊM -->
+        <!-- CÁC CHỨC NĂNG CỦA LAB 4 -->
         <h3>LAB 4: Câu lệnh JPQL</h3>
         <a href="${pageContext.request.contextPath}/video-search">&#128269; Bài 3: Tìm kiếm Video theo từ khóa</a>
         <a href="${pageContext.request.contextPath}/share-report">&#128202; Bài 4: Thống kê lượt chia sẻ Video</a>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" version="5.0">
+
+    <!-- KHAI BÁO FILTER 1 -->
+    <filter>
+        <filter-name>Filter1</filter-name>
+        <!-- Đường dẫn package phải khớp với project của bạn -->
+        <filter-class>com.poly.filter.Filter1</filter-class> 
+    </filter>
+    <filter-mapping>
+        <filter-name>Filter1</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- KHAI BÁO FILTER 2 (Đặt dưới Filter 1 để chạy sau) -->
+    <filter>
+        <filter-name>Filter2</filter-name>
+        <filter-class>com.poly.filter.Filter2</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Filter2</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>
