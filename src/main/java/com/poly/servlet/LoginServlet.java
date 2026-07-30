@@ -15,7 +15,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/login.jsp").forward(req, resp);
+    	req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,8 +50,7 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
         }
-        
         // Nếu đăng nhập thất bại thì nạp lại trang login kèm thông báo lỗi
-        req.getRequestDispatcher("/login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
     }
 }
