@@ -1,7 +1,9 @@
 package com.poly.servlet;
-
 import com.poly.dao.UserDAO;
+import com.poly.dao.UserDAOImpl;
+
 import com.poly.entity.User;
+import com.poly.filter.AuthFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,34 +14,46 @@ import java.io.IOException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/login.jsp").forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("username");
-        String pass = request.getParameter("password");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
         
-        UserDAO dao = new UserDAO();
-        User user = dao.findById(id);
+        UserDAO dao = new UserDAOImpl();
+        User user = dao.findById(username);
         
         if (user == null) {
-            request.setAttribute("message", "Sai username!");
-        } else if (!user.getPassword().equals(pass)) {
-            request.setAttribute("message", "Sai password!");
+            req.setAttribute("message", "Invalid username");
+        } else if (!user.getPassword().equals(password)) {
+            req.setAttribute("message", "Invalid password");
         } else {
-            // Đăng nhập thành công, lưu vào session
-            HttpSession session = request.getSession();
+            // Đăng nhập thành công
+            HttpSession session = req.getSession();
             session.setAttribute("user", user);
+            req.setAttribute("message", "Login successfully");
             
-            // Chuyển hướng (redirect) về lại trang chủ thay vì ở lại trang login
-            response.sendRedirect(request.getContextPath() + "/");
-            return; // Bắt buộc phải có return để dừng hàm, không chạy lệnh forward bên dưới
+            // Lấy lại đường dẫn bị chặn trước đó từ Session
+            String securityUri = (String) session.getAttribute(AuthFilter.SECURITY_URI);
+            
+            if (securityUri != null) {
+                // Xóa uri khỏi session sau khi đã dùng để tránh lỗi cho các lần sau
+                session.removeAttribute(AuthFilter.SECURITY_URI); 
+                resp.sendRedirect(securityUri);
+                return; // Kết thúc hàm tại đây
+            } else {
+                // Nếu không có securityUri (người dùng chủ động vào trang /login), chuyển về trang chủ
+                resp.sendRedirect(req.getContextPath() + "/");
+                return;
+            }
         }
         
-        // Nếu rơi vào các trường hợp báo lỗi (user null hoặc sai pass) thì mới forward lại trang login
-        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+        // Nếu đăng nhập thất bại thì nạp lại trang login kèm thông báo lỗi
+        req.getRequestDispatcher("/login.jsp").forward(req, resp);
     }
 }
