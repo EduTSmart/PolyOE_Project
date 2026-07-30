@@ -1,7 +1,5 @@
 package com.poly.servlet;
 import com.poly.dao.UserDAO;
-import com.poly.dao.UserDAOImpl;
-
 import com.poly.entity.User;
 import com.poly.filter.AuthFilter;
 import jakarta.servlet.ServletException;
@@ -19,13 +17,13 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/login.jsp").forward(req, resp);
     }
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         
-        UserDAO dao = new UserDAOImpl();
+        // Sử dụng class UserDAO đã có sẵn từ các Lab trước
+        UserDAO dao = new UserDAO(); 
         User user = dao.findById(username);
         
         if (user == null) {
@@ -47,7 +45,7 @@ public class LoginServlet extends HttpServlet {
                 resp.sendRedirect(securityUri);
                 return; // Kết thúc hàm tại đây
             } else {
-                // Nếu không có securityUri (người dùng chủ động vào trang /login), chuyển về trang chủ
+                // Nếu không có securityUri, chuyển về trang chủ
                 resp.sendRedirect(req.getContextPath() + "/");
                 return;
             }
