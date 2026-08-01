@@ -50,6 +50,12 @@
     <artifactId>jakarta.servlet.jsp.jstl</artifactId>
     <version>3.0.1</version>
 </dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.9.1</version>
+</dependency>
+
 </dependencies>
 
 </project>

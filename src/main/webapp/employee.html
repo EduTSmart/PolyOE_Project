@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Employee Management - REST Consumer</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+    <h2>Quản lý Nhân viên (Lab 7 - AJAX & REST)</h2>
+    <div>
+        <input id="id" placeholder="Id?"><br><br>
+        <input id="name" placeholder="Name?"><br><br>
+        <input type="radio" id="male" name="gender" checked> Male
+        <input type="radio" id="female" name="gender"> Female<br><br>
+        <input id="salary" placeholder="Salary?"><br><br>
+        <hr>
+        <button onclick="ctrl.create()">Create</button>
+        <button onclick="ctrl.update()">Update</button>
+        <button onclick="ctrl.delete()">Delete</button>
+        <button onclick="ctrl.reset()">Reset</button>
+    </div>
+    <hr>
+    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background-color: #f2f2f2;">
+            <tr>
+                <th style="padding: 8px;">Id</th>
+                <th style="padding: 8px;">Name</th>
+                <th style="padding: 8px;">Gender</th>
+                <th style="padding: 8px;">Salary</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="list"></tbody>
+    </table>
+
+    <script>
+        var ctrl = {
+            // URL trỏ đến EmployeeRestServlet
+            url: "employees",
+
+            // Đưa dữ liệu json lên form
+            setForm: function(employee) {
+                document.getElementById("id").value = employee.id;
+                document.getElementById("name").value = employee.name;
+                document.getElementById("salary").value = employee.salary;
+                document.getElementById("male").checked = employee.gender;
+                document.getElementById("female").checked = !employee.gender;
+            },
+
+            // Lấy dữ liệu từ form tạo thành đối tượng json
+            getForm: function() {
+                return {
+                    id: document.getElementById("id").value,
+                    name: document.getElementById("name").value,
+                    salary: parseFloat(document.getElementById("salary").value),
+                    gender: document.getElementById("male").checked
+                };
+            },
+
+            // Đổ mảng dữ liệu vào bảng
+            fillToTable: function(employees) {
+                let tbody = document.getElementById("list");
+                tbody.innerHTML = "";
+                employees.forEach(emp => {
+                    let tr = `<tr>
+                        <td style="padding: 8px;">${emp.id}</td>
+                        <td style="padding: 8px;">${emp.name}</td>
+                        <td style="padding: 8px;">${emp.gender ? 'Male' : 'Female'}</td>
+                        <td style="padding: 8px;">${emp.salary}</td>
+                        <td style="padding: 8px;"><a href="#" onclick="ctrl.edit('${emp.id}')">Edit</a></td>
+                    </tr>`;
+                    tbody.innerHTML += tr;
+                });
+            },
+
+            // GET toàn bộ dữ liệu
+            loadAll: function() {
+                fetch(this.url)
+                    .then(res => res.json())
+                    .then(data => this.fillToTable(data));
+            },
+
+            // POST thêm mới
+            create: function() {
+                let data = this.getForm();
+                fetch(this.url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {'Content-Type': 'application/json'}
+                }).then(res => res.json()).then(emp => {
+                    this.loadAll();
+                    this.reset();
+                });
+            },
+
+            // PUT cập nhật
+            update: function() {
+                let data = this.getForm();
+                fetch(this.url + "/" + data.id, {
+                    method: 'PUT',
+                    body: JSON.stringify(data),
+                    headers: {'Content-Type': 'application/json'}
+                }).then(res => {
+                    this.loadAll();
+                });
+            },
+
+            // DELETE xóa
+            delete: function() {
+                let data = this.getForm();
+                fetch(this.url + "/" + data.id, {
+                    method: 'DELETE'
+                }).then(res => {
+                    this.loadAll();
+                    this.reset();
+                });
+            },
+
+            // Xóa trắng form
+            reset: function() {
+                this.setForm({id: "", name: "", salary: "", gender: true});
+                document.getElementById("id").focus();
+            },
+
+            // Lấy thông tin 1 nhân viên đưa lên form để sửa
+            edit: function(id) {
+                fetch(this.url + "/" + id)
+                    .then(res => res.json())
+                    .then(emp => {
+                        this.setForm(emp);
+                    });
+            }
+        }
+
+        // Tải dữ liệu lần đầu khi mở trang
+        ctrl.loadAll();
+    </script>
+</body>
+</html>
