@@ -34,7 +34,8 @@
                 alert("Vui lòng nhập tên!"); return;
             }
 
-            var wsUri = "ws://" + document.location.host + "/PolyOE_Project/json/chat/" + encodeURIComponent(currentUser);
+           // var wsUri = "ws://" + document.location.host + "/PolyOE_Project/json/chat/" + encodeURIComponent(currentUser);
+           var wsUri = "ws://" + document.location.host + "/Lab1JV4/json/chat/" + encodeURIComponent(currentUser);
             websocket = new WebSocket(wsUri);
 
             websocket.onopen = function(resp) {

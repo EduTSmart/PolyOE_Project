@@ -18,7 +18,8 @@
 
         function init() {
             // Thay "PolyOE_Project" bằng đúng tên context path dự án của bạn nếu khác
-            var wsUri = "ws://" + document.location.host + "/PolyOE_Project/text/chat";
+            //var wsUri = "ws://" + document.location.host + "/PolyOE_Project/text/chat";
+            var wsUri = "ws://" + document.location.host + "/Lab1JV4/text/chat";
             websocket = new WebSocket(wsUri);
 
             websocket.onopen = function(resp) {
