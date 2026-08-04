@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JSON Chat - Websockets</title>
+    <style>
+        .system-msg { color: gray; font-style: italic; }
+        .user-msg { color: blue; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Phòng Chat Nâng Cao (JSON)</h2>
+    
+    <div id="loginArea">
+        <input type="text" id="username" placeholder="Nhập tên của bạn...">
+        <button onclick="init()">Tham gia phòng</button>
+    </div>
+
+    <div id="chatArea" style="display:none;">
+        <p>Số người online: <strong id="onlineCount">0</strong></p>
+        <div id="messages" style="height: 300px; width: 400px; overflow: auto; border: 2px solid black; padding: 10px; margin-bottom: 10px;"></div>
+        
+        <input type="text" id="message" style="width: 330px;" placeholder="Nhập tin nhắn...">
+        <button onclick="send()">Send</button>
+    </div>
+
+    <script>
+        var websocket = null;
+        var currentUser = "";
+
+        function init() {
+            currentUser = document.getElementById("username").value.trim();
+            if(!currentUser) {
+                alert("Vui lòng nhập tên!"); return;
+            }
+
+            var wsUri = "ws://" + document.location.host + "/PolyOE_Project/json/chat/" + encodeURIComponent(currentUser);
+            websocket = new WebSocket(wsUri);
+
+            websocket.onopen = function(resp) {
+                document.getElementById("loginArea").style.display = "none";
+                document.getElementById("chatArea").style.display = "block";
+            };
+
+            websocket.onmessage = function(resp) {
+                // Parse JSON string thành Javascript Object
+                var msgObj = JSON.parse(resp.data);
+                
+                // Cập nhật số người online
+                if(msgObj.count !== null && msgObj.count !== undefined) {
+                    document.getElementById('onlineCount').innerText = msgObj.count;
+                }
+
+                // Xây dựng dòng tin nhắn dựa vào type
+                var p = document.createElement("p");
+                if (msgObj.type === 0 || msgObj.type === 1) {
+                    p.className = "system-msg";
+                    p.innerText = "Hệ thống: " + msgObj.sender + " " + msgObj.text;
+                } else if (msgObj.type === 2) {
+                    p.className = "user-msg";
+                    p.innerText = msgObj.sender + ": " + msgObj.text;
+                }
+
+                var msgDiv = document.getElementById('messages');
+                msgDiv.appendChild(p);
+                msgDiv.scrollTop = msgDiv.scrollHeight;
+            };
+        }
+
+        function send() {
+            var messageInput = document.getElementById("message");
+            if (messageInput.value.trim() !== "") {
+                // Đóng gói đối tượng JSON (type 2: tin nhắn bình thường)
+                var msgObj = {
+                    text: messageInput.value,
+                    type: 2,
+                    sender: currentUser,
+                    count: 0
+                };
+                // Chuyển đối tượng thành chuỗi JSON trước khi gửi
+                websocket.send(JSON.stringify(msgObj));
+                messageInput.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
+

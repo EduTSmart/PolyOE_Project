@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Chat - Websockets</title>
+</head>
+<body onload="init()">
+    <h2>Phòng Chat Cộng Đồng (Text)</h2>
+    <!-- Vùng hiển thị tin nhắn -->
+    <div id="messages" style="height: 300px; width: 400px; overflow: auto; border: 2px solid black; padding: 10px; margin-bottom: 10px;"></div>
+    
+    <!-- Vùng nhập tin nhắn -->
+    <input type="text" id="message" style="width: 330px;" placeholder="Nhập tin nhắn...">
+    <button onclick="send()">Send</button>
+
+    <script>
+        var websocket = null;
+
+        function init() {
+            // Thay "PolyOE_Project" bằng đúng tên context path dự án của bạn nếu khác
+            var wsUri = "ws://" + document.location.host + "/PolyOE_Project/text/chat";
+            websocket = new WebSocket(wsUri);
+
+            websocket.onopen = function(resp) {
+                console.log("onopen", resp);
+            };
+
+            websocket.onmessage = function(resp) {
+                var message = resp.data;
+                var html = document.getElementById('messages').innerHTML;
+                document.getElementById('messages').innerHTML = html + '<p>' + message + '</p>';
+                // Tự động cuộn xuống cuối
+                var msgDiv = document.getElementById('messages');
+                msgDiv.scrollTop = msgDiv.scrollHeight;
+            };
+
+            websocket.onerror = function(resp) {
+                alert('An error occurred, closing application');
+                console.log("onerror", resp);
+            };
+
+            websocket.close = function(resp) {
+                alert(resp.reason || 'Goodbye');
+                console.log("onclose", resp);
+            };
+        }
+
+        function send() {
+            var messageInput = document.getElementById("message");
+            if (messageInput.value.trim() !== "") {
+                websocket.send(messageInput.value);
+                messageInput.value = ""; // Xóa form sau khi gửi
+            }
+        }
+    </script>
+</body>
+</html>

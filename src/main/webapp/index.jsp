@@ -60,6 +60,11 @@
             <h3>&#127760; CHỨC NĂNG CÔNG KHAI</h3>
             <a href="${pageContext.request.contextPath}/video/list">Danh sách Video</a>
             <a href="${pageContext.request.contextPath}/video-search">Tìm kiếm Video theo từ khóa</a>
+            
+                 <!-- THÊM 2 LINK CHO LAB 8 Ở ĐÂY -->
+        <a href="${pageContext.request.contextPath}/text-chat.html">&#128172; Phòng Chat Cơ bản (Text)</a>
+        <a href="${pageContext.request.contextPath}/json-chat.html">&#128172; Phòng Chat Nâng cao (JSON)</a>
+            
         </div>
 
         <!-- MENU 2: CHỨC NĂNG NGƯỜI DÙNG (Chỉ hiện khi đã đăng nhập) -->
