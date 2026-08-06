@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập & Đăng Ký</title>
+    <title>Chia sẻ Video</title>
     <style>
-        /* === RESET & BIẾN CSS TÙY CHỈNH === */
+        /* === KẾT THỪA BIẾN CSS TỪ TRANG LOGIN === */
         :root {
             --primary-orange: #f39c12;
             --hover-orange: #e67e22;
@@ -33,7 +33,6 @@
             padding: 50px 20px;
         }
 
-        /* === BỐ CỤC CHÍNH CỦA TRANG === */
         .page-wrapper {
             display: flex;
             gap: 30px;
@@ -43,20 +42,21 @@
             justify-content: center;
         }
 
-        /* === STYLE CHO FORM CONTAINER === */
+        /* === BỐ CỤC CARD === */
         .form-container {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             width: 100%;
-            max-width: 450px; /* Giới hạn chiều rộng mỗi form */
+            max-width: 450px;
             display: flex;
             flex-direction: column;
         }
 
         .form-header {
-            background-color: var(--header-bg);
+            /* Đổi màu nền Header thành màu cam để phân biệt với form Login (Xanh đen) */
+            background-color: var(--primary-orange); 
             color: #fff;
             padding: 20px;
             font-size: 20px;
@@ -67,13 +67,12 @@
         }
 
         .form-body {
-            padding: 30px 25px;
+            padding: 30px 25px 20px;
             flex: 1;
         }
 
-        /* === CÁC THÀNH PHẦN TRONG FORM === */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-label {
@@ -84,6 +83,7 @@
             font-size: 14px;
         }
 
+        /* Form Control cho ô Input */
         .form-control {
             width: 100%;
             padding: 12px 15px;
@@ -99,57 +99,29 @@
             box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
         }
 
-        /* Dành cho checkbox Remember Me */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            text-transform: uppercase;
-            font-size: 13px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-        }
-
-        /* === GRID TRONG FORM ĐĂNG KÝ === */
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        /* === THÔNG BÁO ALERT === */
         .message-alert {
             color: #e74c3c;
             font-size: 14px;
             text-align: center;
             margin-bottom: 15px;
             font-weight: 500;
-            min-height: 20px; /* Giữ layout không bị giật khi có/không có lỗi */
+            min-height: 20px;
         }
 
-        /* === BUTTON === */
+        .text-muted {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 6px;
+            display: block;
+        }
+
+        /* Nút Send */
         .form-footer {
             padding: 0 25px 30px;
         }
 
         .btn-orange {
-            background-color: var(--primary-orange);
+            background-color: var(--header-bg); /* Đổi màu nút thành xanh đen cho nổi bật */
             color: #fff;
             border: none;
             width: 100%;
@@ -163,59 +135,48 @@
         }
 
         .btn-orange:hover {
-            background-color: var(--hover-orange);
+            background-color: #1a252f;
         }
 
         .btn-orange:active {
             transform: scale(0.98);
         }
-
-        /* === RESPONSIVE (Dành cho điện thoại) === */
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .page-wrapper {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- FORM ĐĂNG KÝ -->
+<div class="page-wrapper">
     <div class="form-container">
-        <div class="form-header">Registration</div>
-        <form action="${pageContext.request.contextPath}/account/sign-up" method="post">
+        
+        <!-- 1. ĐÃ SỬA: Tiêu đề Form thành SHARE VIDEO -->
+        <div class="form-header">Share Video</div>
+        
+        <!-- Action trỏ đúng về VideoServlet kèm ID video -->
+        <form action="${pageContext.request.contextPath}/video/share/${videoId}" method="POST">
             <div class="form-body">
+                
+                <!-- Vùng hiển thị thông báo lỗi/thành công -->
                 <div class="message-alert">${message}</div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Create a password" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Fullname</label>
-                        <input type="text" name="fullname" class="form-control" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
-                    </div>
+                
+                <!-- Truyền ngầm videoId về Server -->
+                <input type="hidden" name="videoId" value="${videoId}">
+                
+                <div class="form-group">
+                    <label class="form-label">Your friend's email?</label>
+                    
+                    <!-- 2. ĐÃ SỬA: Thêm class "form-control" để bắt style CSS -->
+                    <input type="email" name="email" class="form-control" placeholder="example@gmail.com, test@fpt.edu.vn" required>
+                    
+                    <span class="text-muted">Có thể gửi nhiều email, phân cách bằng dấu phẩy (,)</span>
                 </div>
             </div>
+            
             <div class="form-footer">
-                <button type="submit" class="btn-orange">Sign Up</button>
+                <!-- 3. ĐÃ SỬA: Thêm class "btn-orange" để bắt style CSS -->
+                <button type="submit" class="btn-orange">Send</button>
             </div>
         </form>
+        
     </div>
 </div>
 

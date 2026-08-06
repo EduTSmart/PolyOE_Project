@@ -1,6 +1,7 @@
 package com.poly.servlet;
 
 import com.poly.dao.VideoDAO;
+import com.poly.entity.User;
 import com.poly.entity.Video;
 import com.poly.utils.EmailUtils;
 
@@ -111,10 +112,21 @@ public class VideoServlet extends HttpServlet {
             // 4. CHỨC NĂNG: SHARE VIDEO
             // ==========================================
             else if (uri.contains("/video/share/")) {
+                // 1. Kiểm tra xem người dùng đã đăng nhập chưa
+                User user = (User) request.getSession().getAttribute("user");
+                
+                if (user == null) {
+                    // Chưa đăng nhập: Lưu lại đường dẫn hiện tại để sau khi đăng nhập xong sẽ tự động quay lại đây
+                    request.getSession().setAttribute("securityUri", request.getRequestURI());
+                    
+                    // Chuyển hướng người dùng sang trang đăng nhập
+                    response.sendRedirect(request.getContextPath() + "/login");
+                    return; // Dừng thực thi các lệnh bên dưới
+                }
+
+                // Đã đăng nhập: Cho phép hiển thị form Share
                 String id = uri.substring(uri.lastIndexOf("/") + 1);
                 request.setAttribute("videoId", id);
-                
-                // Chuyển hướng sang giao diện nhập form email để chia sẻ
                 request.getRequestDispatcher("/views/share.jsp").forward(request, response);
             }
             
@@ -124,32 +136,64 @@ public class VideoServlet extends HttpServlet {
             request.getRequestDispatcher("/page.jsp").forward(request, response);
         }
     }
-
     @Override
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI();
+        
         if (uri.contains("/video/share/")) {
+            // Kiểm tra bảo mật lần 2: Đảm bảo đã đăng nhập
+            User user = (User) request.getSession().getAttribute("user");
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
             try {
                 String videoId = request.getParameter("videoId");
                 String friendEmail = request.getParameter("email");
                 
-                // Xử lý gửi nhiều email (cách nhau bởi dấu phẩy)
-                String[] emails = friendEmail.split(",");
-                String videoLink = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/video/detail/" + videoId;
+                // Validate cơ bản
+                if (videoId == null || videoId.isEmpty() || friendEmail == null || friendEmail.isEmpty()) {
+                    throw new Exception("Vui lòng điền đầy đủ thông tin!");
+                }
+
+                // Xây dựng đường dẫn (URL) tuyệt đối của video để người nhận click vào xem trực tiếp
+                String videoLink = request.getScheme() + "://" + request.getServerName() + ":" 
+                                 + request.getServerPort() + request.getContextPath() 
+                                 + "/video/detail/" + videoId;
                 
+                // Xử lý tách chuỗi nếu người dùng nhập nhiều email cách nhau bằng dấu phẩy (,)
+                String[] emails = friendEmail.split(",");
                 for (String email : emails) {
-                    EmailUtils.send(email.trim(), "Someone shared a video with you!", "Click link để xem: " + videoLink);
+                    String cleanEmail = email.trim();
+                    if (!cleanEmail.isEmpty()) {
+                        // Gọi hàm tiện ích EmailUtils đã được định nghĩa sẵn
+                        EmailUtils.send(
+                            cleanEmail, 
+                            "Someone shared a video with you!", 
+                            "<h3>Xin chào!</h3><p>Bạn bè của bạn đã chia sẻ một video thú vị trên hệ thống .</p><p>Click vào liên kết sau để xem ngay: <a href='" + videoLink + "'>" + videoLink + "</a></p>"
+                        );
+                    }
                 }
                 
-                // Ghi nhận bảng Share (Yêu cầu JPA Entity Share)
-                // Lấy user từ session và Insert Share DAO ở đây...
+                // (Tùy chọn) Ghi nhận lịch sử chia sẻ vào Database thông qua ShareDAO nếu có
+                // ShareDAO shareDao = new ShareDAO();
+                // shareDao.insert(new Share(user, videoId, new Date()));
                 
-                request.setAttribute("message", "Đã gửi video thành công!");
+                request.setAttribute("message", "Đã gửi video thành công qua email!");
             } catch (Exception e) {
+                e.printStackTrace();
+                // Hiển thị chi tiết lỗi nếu kết nối SMTP hoặc App Password gặp sự cố
                 request.setAttribute("message", "Gửi thất bại: " + e.getMessage());
             }
+            
+            // Giữ lại videoId để form JSP không bị mất dữ liệu khi load lại trang hiển thị thông báo
+            String id = uri.substring(uri.lastIndexOf("/") + 1);
+            request.setAttribute("videoId", id);
+            
             request.getRequestDispatcher("/views/share.jsp").forward(request, response);
         }
     }
-
+    
 }
