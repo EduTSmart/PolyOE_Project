@@ -1,6 +1,19 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<style>
+/* Style chuẩn form của dự án */
+.form-container { border: 1px solid #f57c00; width: 50%; margin: 20px auto; font-family: Arial, sans-serif; }
+.form-header { background-color: #e8f5e9; padding: 12px; font-weight: bold; font-size: 18px; border-bottom: 1px solid #f57c00; text-transform: uppercase; }
+.form-body { padding: 20px; background: white; }
+.form-group { margin-bottom: 15px; }
+.form-label { text-transform: uppercase; font-size: 14px; margin-bottom: 5px; display: block; }
+.form-control { width: 100%; padding: 8px; border: 1px solid #f57c00; box-sizing: border-box; }
+.form-footer { background-color: #f5f5f5; padding: 10px; text-align: right; border-top: 1px solid #f57c00; }
+.btn-orange { background-color: #f57c00; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
+.btn-orange:hover { background-color: #e65100; }
+.message-alert { text-align: center; color: red; font-style: italic; }
 
+</style>
 <!-- 1. Thanh thông báo Đăng nhập & Lượt truy cập (Giữ lại từ bài cũ) -->
 <div style="background-color: #e0f7fa; padding: 10px 20px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid #b2ebf2;">
     <span>

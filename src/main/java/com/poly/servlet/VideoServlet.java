@@ -2,6 +2,8 @@ package com.poly.servlet;
 
 import com.poly.dao.VideoDAO;
 import com.poly.entity.Video;
+import com.poly.utils.EmailUtils;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -125,6 +127,29 @@ public class VideoServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Phương thức này sẽ dùng để xử lý khi người dùng nhấn nút Submit trên form Share (Gửi Email)
+        String uri = request.getRequestURI();
+        if (uri.contains("/video/share/")) {
+            try {
+                String videoId = request.getParameter("videoId");
+                String friendEmail = request.getParameter("email");
+                
+                // Xử lý gửi nhiều email (cách nhau bởi dấu phẩy)
+                String[] emails = friendEmail.split(",");
+                String videoLink = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/video/detail/" + videoId;
+                
+                for (String email : emails) {
+                    EmailUtils.send(email.trim(), "Someone shared a video with you!", "Click link để xem: " + videoLink);
+                }
+                
+                // Ghi nhận bảng Share (Yêu cầu JPA Entity Share)
+                // Lấy user từ session và Insert Share DAO ở đây...
+                
+                request.setAttribute("message", "Đã gửi video thành công!");
+            } catch (Exception e) {
+                request.setAttribute("message", "Gửi thất bại: " + e.getMessage());
+            }
+            request.getRequestDispatcher("/views/share.jsp").forward(request, response);
+        }
     }
+
 }

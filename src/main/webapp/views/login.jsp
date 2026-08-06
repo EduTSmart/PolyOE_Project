@@ -6,12 +6,29 @@
     <title>Đăng Nhập</title>
 </head>
 <body>
-    <h2>Đăng Nhập Hệ Thống</h2>
-    <div style="color: red;">${message}</div>
-    <form action="${pageContext.request.contextPath}/login" method="POST">
-        Username: <input type="text" name="username" required><br><br>
-        Password: <input type="password" name="password" required><br><br>
-        <button type="submit">Đăng nhập</button>
+<div class="form-container">
+    <div class="form-header">Login</div>
+    <form action="${pageContext.request.contextPath}/login" method="post">
+        <div class="form-body">
+            <div class="message-alert">${message}</div>
+            <div class="form-group">
+                <label class="form-label">Username?</label>
+                <input type="text" name="username" value="${savedUser}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password?</label>
+                <input type="password" name="password" value="${savedPass}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="remember" value="true" ${not empty savedUser ? 'checked' : ''}> 
+                <label style="text-transform: uppercase; font-size: 14px;">Remember Me?</label>
+            </div>
+        </div>
+        <div class="form-footer">
+            <button type="submit" class="btn-orange">Login</button>
+        </div>
     </form>
+</div>
+
 </body>
 </html>
