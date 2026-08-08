@@ -12,7 +12,8 @@
             <div style="border: 1px solid #ffcc80; text-align: center; padding: 10px;">
                 <!-- Click vào Poster sẽ gọi URL xem chi tiết -->
                 <a href="${pageContext.request.contextPath}/video/detail/${v.id}">
-                    <img src="${v.poster}" alt="POSTER" style="width: 100%; height: 200px; object-fit: cover;">
+                    <!-- Code mới (thêm đường dẫn Context Path và thư mục images) -->
+<img src="${pageContext.request.contextPath}/images/${v.poster}" alt="POSTER" style="width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #ffcc80;">
                 </a>
                 <h4 style="background-color: #e8f5e9; margin: 5px 0; padding: 5px;">${v.title}</h4>
                 <div>

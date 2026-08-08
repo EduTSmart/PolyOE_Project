@@ -72,11 +72,11 @@
 </div>
 
 <!-- Script nhỏ để bật/tắt Dropdown My Account -->
+<!-- Script nhỏ để bật/tắt Dropdown My Account -->
 <script>
-    const accountBtn = document.querySelector('span:contains("MY ACCOUNT")') || document.querySelector('.menu-dropdown-btn');
     const dropdown = document.getElementById('accountDropdown');
     
-    // Tìm thẻ span bằng Javascript thuần thay cho jQuery
+    // Tìm thẻ span chứa chữ "MY ACCOUNT" bằng Javascript thuần
     const spans = document.querySelectorAll('span');
     spans.forEach(span => {
         if(span.innerText.includes('MY ACCOUNT')) {
@@ -89,7 +89,7 @@
 
     // Click ra ngoài thì ẩn dropdown đi
     window.addEventListener('click', function() {
-        if (dropdown.style.display === 'block') {
+        if (dropdown && dropdown.style.display === 'block') {
             dropdown.style.display = 'none';
         }
     });
