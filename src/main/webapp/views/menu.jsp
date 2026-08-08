@@ -12,9 +12,9 @@
 .btn-orange { background-color: #f57c00; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
 .btn-orange:hover { background-color: #e65100; }
 .message-alert { text-align: center; color: red; font-style: italic; }
-
 </style>
-<!-- 1. Thanh thông báo Đăng nhập & Lượt truy cập (Giữ lại từ bài cũ) -->
+
+<!-- 1. Thanh thông báo Đăng nhập & Lượt truy cập -->
 <div style="background-color: #e0f7fa; padding: 10px 20px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid #b2ebf2;">
     <span>
         <c:choose>
@@ -49,11 +49,9 @@
     
     <!-- Dropdown Tài khoản -->
     <div style="position: relative; display: inline-block;">
-        <span style="font-size: 16px; font-weight: bold; color: #1976d2; cursor: pointer; padding: 5px 0;">
+        <span style="font-size: 16px; font-weight: bold; color: #1976d2; cursor: pointer; padding: 5px 0;" class="menu-toggle" data-target="accountDropdown">
             MY ACCOUNT &#9662;
         </span>
-        
-        <!-- Nội dung Dropdown -->
         <div style="position: absolute; top: 100%; left: 0; background-color: white; min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 10; border: 1px solid #ff7043; border-radius: 4px; overflow: hidden; display: none;" id="accountDropdown">
             <c:choose>
                 <c:when test="${empty sessionScope.user}">
@@ -69,28 +67,46 @@
             </c:choose>
         </div>
     </div>
+
+    <!-- Dropdown Admin (Chỉ hiển thị nếu user là Admin) -->
+    <c:if test="${not empty sessionScope.user and sessionScope.user.admin}">
+        <div style="position: relative; display: inline-block;">
+            <span style="font-size: 16px; font-weight: bold; color: #d32f2f; cursor: pointer; padding: 5px 0;" class="menu-toggle" data-target="adminDropdown">
+                ADMIN TOOLS &#9662;
+            </span>
+            <div style="position: absolute; top: 100%; left: 0; background-color: white; min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 10; border: 1px solid #d32f2f; border-radius: 4px; overflow: hidden; display: none;" id="adminDropdown">
+                <a href="${pageContext.request.contextPath}/admin/video" style="display: block; padding: 10px 15px; text-decoration: none; color: black; border-bottom: 1px solid #eee;">Quản lý Video</a>
+                <a href="${pageContext.request.contextPath}/admin/user" style="display: block; padding: 10px 15px; text-decoration: none; color: black; border-bottom: 1px solid #eee;">Quản lý Người dùng</a>
+                <a href="${pageContext.request.contextPath}/admin/reports" style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Báo cáo thống kê</a>
+            </div>
+        </div>
+    </c:if>
 </div>
 
-<!-- Script nhỏ để bật/tắt Dropdown My Account -->
-<!-- Script nhỏ để bật/tắt Dropdown My Account -->
+<!-- Script hỗ trợ bật/tắt các Dropdown -->
 <script>
-    const dropdown = document.getElementById('accountDropdown');
+    const toggles = document.querySelectorAll('.menu-toggle');
     
-    // Tìm thẻ span chứa chữ "MY ACCOUNT" bằng Javascript thuần
-    const spans = document.querySelectorAll('span');
-    spans.forEach(span => {
-        if(span.innerText.includes('MY ACCOUNT')) {
-            span.addEventListener('click', function(e) {
-                e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            const targetId = this.getAttribute('data-target');
+            const targetMenu = document.getElementById(targetId);
+            
+            // Đóng tất cả các menu khác đang mở
+            document.querySelectorAll('div[id$="Dropdown"]').forEach(menu => {
+                if(menu.id !== targetId) menu.style.display = 'none';
             });
-        }
+            
+            // Bật/tắt menu được click
+            targetMenu.style.display = targetMenu.style.display === 'block' ? 'none' : 'block';
+        });
     });
 
-    // Click ra ngoài thì ẩn dropdown đi
+    // Click ra ngoài thì ẩn tất cả dropdown
     window.addEventListener('click', function() {
-        if (dropdown && dropdown.style.display === 'block') {
-            dropdown.style.display = 'none';
-        }
+        document.querySelectorAll('div[id$="Dropdown"]').forEach(menu => {
+            menu.style.display = 'none';
+        });
     });
 </script>
