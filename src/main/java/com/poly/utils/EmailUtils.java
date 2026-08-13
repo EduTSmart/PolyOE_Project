@@ -9,7 +9,7 @@ public class EmailUtils {
     public static void send(String to, String subject, String content) throws Exception {
         // Cấu hình tài khoản email người gửi (Nên dùng App Password của Google)
         final String username = "edutsmart@gmail.com"; // THAY BẰNG EMAIL CỦA BẠN
-        final String password = "";    // THAY BẰNG APP PASSWORD
+        final String password = "mvrg epjc uqqd txgc";    // THAY BẰNG APP PASSWORD
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");

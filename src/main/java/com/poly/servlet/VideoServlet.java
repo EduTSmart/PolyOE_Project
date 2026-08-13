@@ -1,6 +1,9 @@
 package com.poly.servlet;
 
+import com.poly.dao.FavoriteDAO;
+import com.poly.dao.UserDAO;
 import com.poly.dao.VideoDAO;
+import com.poly.entity.Favorite;
 import com.poly.entity.User;
 import com.poly.entity.Video;
 import com.poly.utils.EmailUtils;
@@ -15,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet({"/video/list", "/video/detail/*", "/video/like/*", "/video/share/*"})
+@WebServlet({"/video/list", "/video/detail/*", "/video/like/*", "/video/share/*","/video/unlike/*"})
 public class VideoServlet extends HttpServlet {
     
     @Override
@@ -60,22 +63,27 @@ public class VideoServlet extends HttpServlet {
                     video.setViews(video.getViews() + 1);
                     dao.update(video);
 
-                    // B. Xử lý Cookie để lưu lại lịch sử video đã xem
+                 // B. Xử lý Cookie để lưu lại lịch sử video đã xem
                     Cookie[] cookies = request.getCookies();
                     String viewedIds = "";
                     if (cookies != null) {
                         for (Cookie c : cookies) {
                             if (c.getName().equals("viewedVideos")) {
                                 viewedIds = c.getValue();
+                                // Thêm URLDecoder để tránh lỗi ký tự đặc biệt
+                                viewedIds = java.net.URLDecoder.decode(viewedIds, "UTF-8"); 
                                 break;
                             }
                         }
                     }
                     
-                    // Nếu video này chưa có trong chuỗi ID đã xem thì nối thêm vào
+                 // Nếu video này chưa có trong chuỗi ID đã xem thì nối thêm vào
                     if (!viewedIds.contains(id)) {
                         viewedIds = viewedIds.isEmpty() ? id : viewedIds + "," + id;
-                        Cookie cookie = new Cookie("viewedVideos", viewedIds);
+                        
+                        // Thêm URLEncoder trước khi lưu để an toàn
+                        String encodedViewedIds = java.net.URLEncoder.encode(viewedIds, "UTF-8");
+                        Cookie cookie = new Cookie("viewedVideos", encodedViewedIds);
                         cookie.setMaxAge(60 * 60 * 24 * 30); // Giữ Cookie trong 30 ngày
                         cookie.setPath("/");
                         response.addCookie(cookie);
@@ -107,7 +115,33 @@ public class VideoServlet extends HttpServlet {
                 // Tạm thời chuyển hướng người dùng quay lại đúng trang chi tiết video đó
                 response.sendRedirect(request.getContextPath() + "/video/detail/" + id);
                 
-            } 
+            } else if (uri.contains("unlike")) {
+                // 1. Lấy ID video cần bỏ thích từ URL
+                String videoId = uri.substring(uri.lastIndexOf("/") + 1);
+                
+                // 2. Lấy thông tin User đang đăng nhập
+                User user = (User) request.getSession().getAttribute("user");
+                
+                if (user != null) {
+                    FavoriteDAO favDao = new FavoriteDAO();
+                    
+                    // 3. Duyệt danh sách yêu thích của User để tìm bản ghi cần xóa
+                    for (Favorite fav : user.getFavorites()) {
+                        if (fav.getVideo().getId().equals(videoId)) {
+                            favDao.deleteById(fav.getId()); // Gọi hàm delete của DAO để xóa khỏi Database
+                            break;
+                        }
+                    }
+                    
+                    // 4. Load lại thông tin User từ DB vào Session để danh sách trên giao diện cập nhật ngay lập tức
+                    UserDAO userDao = new UserDAO();
+                    request.getSession().setAttribute("user", userDao.findById(user.getId()));
+                }
+                
+                // 5. Điều hướng người dùng quay lại trang Video Yêu Thích
+                response.sendRedirect(request.getContextPath() + "/user-favorites");
+                return; // Kết thúc request tại đây
+            }
             // ==========================================
             // 4. CHỨC NĂNG: SHARE VIDEO
             // ==========================================
